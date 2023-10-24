@@ -2,8 +2,9 @@ import pygame
 import os
 
 # Global Constants
-TITLE = "Chrome Dino Runner"
-SCREEN_HEIGHT = 600
+# Global Constants
+TITLE = "Nordesdino"
+SCREEN_HEIGHT = 500
 SCREEN_WIDTH = 1100
 FPS = 30
 IMG_DIR = os.path.join(os.path.dirname(__file__), "..", "assets")
@@ -60,14 +61,33 @@ BIRD = [
     pygame.image.load(os.path.join(IMG_DIR, "Bird/Bird1.png")),
     pygame.image.load(os.path.join(IMG_DIR, "Bird/Bird2.png")),
 ]
+# coloquei s constante do power up Clock
+CLOCK_RUNNING = [
+    pygame.image.load(os.path.join(IMG_DIR, "Dino/DinoRun1.png")),
+    pygame.image.load(os.path.join(IMG_DIR, "Dino/DinoRun2.png")),
+]
+# ele a baixando
+CLOCK_DUCKING = [
+    pygame.image.load(os.path.join(IMG_DIR, "Dino/DinoDuck1.png")),
+    pygame.image.load(os.path.join(IMG_DIR, "Dino/DinoDuck2.png")),
+]
+#pulando
+CLOCK_JUMPING = pygame.image.load(os.path.join(IMG_DIR, "Dino/DinoJump.png"))
 
 CLOUD = pygame.image.load(os.path.join(IMG_DIR, 'Other/Cloud.png'))
 SHIELD = pygame.image.load(os.path.join(IMG_DIR, 'Other/shield.png'))
 HAMMER = pygame.image.load(os.path.join(IMG_DIR, 'Other/hammer.png'))
+CLOCK = pygame.image.load(os.path.join(IMG_DIR, 'Other/Clock.png'))# aqui é a imagem do clock
+FLYING = pygame.image.load(os.path.join(IMG_DIR, 'Other/Flying.png'))
 
 BG = pygame.image.load(os.path.join(IMG_DIR, 'Other/Track.png'))
 
 HEART = pygame.image.load(os.path.join(IMG_DIR, 'Other/SmallHeart.png'))
 
+FLYING_ICON = pygame.image.load(os.path.join(IMG_DIR, 'Other/h.png'))
+
 DEFAULT_TYPE = "default"
 SHIELD_TYPE = "shield"
+HAMMER_TYPE = "hammer"
+CLOCK_TYPE = "clock"
+FLYING_TYPE = "flying"

@@ -1,21 +1,24 @@
 import pygame
-from pygame.sprite import Sprite
+import random
 
-from dino_runner.utils.constants import RUNNING, JUMPING, DUCKING, DEFAULT_TYPE, SHIELD_TYPE, DUCKING_SHIELD, JUMPING_SHIELD, RUNNING_SHIELD
+from pygame.sprite import Sprite
+from dino_runner.utils.constants import RUNNING, JUMPING, DUCKING, DEFAULT_TYPE, SHIELD_TYPE, CLOCK_TYPE, HAMMER_TYPE, DUCKING_SHIELD, JUMPING_SHIELD, RUNNING_SHIELD, DUCKING_HAMMER, JUMPING_HAMMER, RUNNING_HAMMER, CLOCK_DUCKING, CLOCK_JUMPING, CLOCK_RUNNING, FLYING
 
 X_POS = 80
 Y_POS = 310
 Y_POS_DUCK = 340
 JUMP_VEL = 8.5
 
-DUCK_IMG = { DEFAULT_TYPE: DUCKING, SHIELD_TYPE: DUCKING_SHIELD}
-JUMP_IMG = { DEFAULT_TYPE: JUMPING, SHIELD_TYPE: JUMPING_SHIELD}
-RUN_IMG = { DEFAULT_TYPE: RUNNING, SHIELD_TYPE: RUNNING_SHIELD}
+DUCK_IMG = { DEFAULT_TYPE: DUCKING, SHIELD_TYPE: DUCKING_SHIELD, HAMMER_TYPE: DUCKING_HAMMER, CLOCK_TYPE: CLOCK_DUCKING }
+JUMP_IMG = { DEFAULT_TYPE: JUMPING, SHIELD_TYPE: JUMPING_SHIELD, HAMMER_TYPE: JUMPING_HAMMER, CLOCK_TYPE: CLOCK_JUMPING }
+RUN_IMG = { DEFAULT_TYPE: RUNNING, SHIELD_TYPE: RUNNING_SHIELD, HAMMER_TYPE: RUNNING_HAMMER, CLOCK_TYPE: CLOCK_RUNNING }
+
+
 
 class Dinosaur(Sprite):
     def __init__(self):
         self.type = DEFAULT_TYPE
-        self.image = RUN_IMG[self.type][0]
+        self.image = RUN_IMG[self.type][0] 
         self.dino_rect = self.image.get_rect()
         self.dino_rect.x = X_POS
         self.dino_rect.y = Y_POS
@@ -24,6 +27,8 @@ class Dinosaur(Sprite):
         self.dino_run = True
         self.dino_jump = False
         self.dino_duck = False
+        self.shield_active = False
+        self.dino_flying = False
         self.setup_state()
 
     def setup_state(self):
@@ -32,15 +37,17 @@ class Dinosaur(Sprite):
         self.show_text = False
         self.power_up_time = 0
 
-    def update(self, user_input):
+    def update(self, user_input, obstacles):
         if self.dino_run:
             self.run()
         elif self.dino_jump:
             self.jump()
         elif self.dino_duck:
-            self.duck()      
+            self.duck()
+        
+        
 
-        if user_input[pygame.K_UP] and not self.dino_jump:
+        if (user_input[pygame.K_UP] or user_input[pygame.K_SPACE]) and not self.dino_jump:
             self.dino_jump = True
             self.dino_run = False
             self.dino_duck = False
@@ -55,6 +62,35 @@ class Dinosaur(Sprite):
 
         if self.step_index >= 9:
             self.step_index = 0
+    
+        
+        ##
+        if self.dino_flying:
+            if self.flying_duration > 0:
+                if user_input[pygame.K_UP]:
+                    self.fly_up()
+                elif user_input[pygame.K_DOWN]:
+                    self.fly_down()
+                self.flying_duration -= 1
+            else:
+                self.dino_flying = False
+                self.image = self.original_image
+
+
+    def fly_up(self):#
+        if self.dino_rect.y > Y_POS - 200:  
+            self.dino_rect.y -= 10  
+
+    def fly_down(self):#
+        if self.dino_rect.y < Y_POS + 100:  
+            self.dino_rect.y += 10  
+
+    def activate_flying(self):#
+        self.dino_flying = True
+        self.flying_duration = 500  
+        self.original_image = self.image
+        self.image = FLYING  
+        
 
     def run(self):
         self.image = RUN_IMG[self.type][self.step_index // 5]
@@ -64,15 +100,15 @@ class Dinosaur(Sprite):
         self.step_index += 1
 
     def jump(self):
+     if self.type in JUMP_IMG:
         self.image = JUMP_IMG[self.type]
         if self.dino_jump:
             self.dino_rect.y -= self.jump_vel * 4
             self.jump_vel -= 0.8
-
         if self.jump_vel < -JUMP_VEL:
             self.dino_rect.y = Y_POS
             self.dino_jump = False
-            self.jump_vel = JUMP_VEL  
+            self.jump_vel = JUMP_VEL
 
     def duck(self):
         self.image = DUCK_IMG[self.type][self.step_index // 5]
@@ -80,7 +116,7 @@ class Dinosaur(Sprite):
         self.dino_rect.x = X_POS
         self.dino_rect.y = Y_POS_DUCK
         self.step_index += 1
-        self.dino_duck = False                  
+        self.dino_duck = False
 
     def draw(self, screen):
         screen.blit(self.image, (self.dino_rect.x, self.dino_rect.y))
